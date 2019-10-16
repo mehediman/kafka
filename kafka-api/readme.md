@@ -1,19 +1,3 @@
-# Simple Kafka Producer
-
-## Kafka Topic
-
-```shell
-thetechcheck
-```
-
-## Creating a Kafka Topic
-
-```cd``` into the Kafka directory, and run the following command to create a new topic:
-
-```shell
-./bin/kafka-topics.sh --create --topic thetechcheck --replication-factor 1 --partitions 1 --zookeeper localhost:2181
-```
-
 ## Running the SpringBoot application
 
 ```cd``` into the project directory and run the following command to create a ```.jar``` file of the project:
