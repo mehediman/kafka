@@ -17,7 +17,7 @@ import java.util.Properties;
 public class SimpleKafkaProducerApplication implements CommandLineRunner {
 
     @Value("${kafka.topic}")
-    private String theTechCheckTopicName;
+    private String topicName;
 
     @Value("${kafka.bootstrap.servers}")
     private String kafkaBootstrapServers;
@@ -28,6 +28,9 @@ public class SimpleKafkaProducerApplication implements CommandLineRunner {
     @Value("${zookeeper.host}")
     String zookeeperHost;
 
+    private static final String CONSUMER = "c";
+    private static final String PRODUCER = "p";
+
     private static final Logger logger = Logger.getLogger(SimpleKafkaProducerApplication.class);
 
     public static void main( String[] args ) {
@@ -35,69 +38,74 @@ public class SimpleKafkaProducerApplication implements CommandLineRunner {
     }
 
     @Override
-    public void run(String... args) {
+    public void run(String[] args) {
 
-        /*
-         * Defining producer properties.
-         */
-        Properties producerProperties = new Properties();
-        producerProperties.put("bootstrap.servers", kafkaBootstrapServers);
-        producerProperties.put("acks", "all");
-        producerProperties.put("retries", 0);
-        producerProperties.put("batch.size", 16384);
-        producerProperties.put("linger.ms", 1);
-        producerProperties.put("buffer.memory", 33554432);
-        producerProperties.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
-        producerProperties.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+        String process = (args.length > 1 && args[1].equalsIgnoreCase(CONSUMER)) ? CONSUMER : PRODUCER;
+
+        if (process.equalsIgnoreCase(PRODUCER)) {
+            /*
+             * Defining producer properties.
+             */
+            Properties producerProperties = new Properties();
+            producerProperties.put("bootstrap.servers", kafkaBootstrapServers);
+            producerProperties.put("acks", "all");
+            producerProperties.put("retries", 0);
+            producerProperties.put("batch.size", 16384);
+            producerProperties.put("linger.ms", 1);
+            producerProperties.put("buffer.memory", 33554432);
+            producerProperties.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+            producerProperties.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
 
         /*
         Creating a Kafka Producer object with the configuration above.
          */
-        KafkaProducer<String, String> producer = new KafkaProducer<>(producerProperties);
+            KafkaProducer<String, String> producer = new KafkaProducer<>(producerProperties);
 
         /*
         The sendTestMessagesToKafka method will generate some random test messages
         and send them to Kafka.
          */
-        sendTestMessagesToKafka(producer);
-
-        /*
+            sendTestMessagesToKafka(producer);
+        }
+        else {
+            /*
         Now that we've produced some test messages, let's see how to consume them using a Kafka consumer object.
          */
 
-        /*
-         * Defining Kafka consumer properties.
-         */
-        Properties consumerProperties = new Properties();
-        consumerProperties.put("bootstrap.servers", kafkaBootstrapServers);
-        consumerProperties.put("group.id", zookeeperGroupId);
-        consumerProperties.put("zookeeper.session.timeout.ms", "6000");
-        consumerProperties.put("zookeeper.sync.time.ms","2000");
-        consumerProperties.put("auto.commit.enable", "false");
-        consumerProperties.put("auto.commit.interval.ms", "1000");
-        consumerProperties.put("consumer.timeout.ms", "-1");
-        consumerProperties.put("max.poll.records", "1");
-        consumerProperties.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
-        consumerProperties.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+            /*
+             * Defining Kafka consumer properties.
+             */
+            Properties consumerProperties = new Properties();
+            consumerProperties.put("bootstrap.servers", kafkaBootstrapServers);
+            consumerProperties.put("group.id", zookeeperGroupId);
+            consumerProperties.put("zookeeper.session.timeout.ms", "6000");
+            consumerProperties.put("zookeeper.sync.time.ms","2000");
+            consumerProperties.put("auto.commit.enable", "false");
+            consumerProperties.put("auto.commit.interval.ms", "1000");
+            consumerProperties.put("consumer.timeout.ms", "-1");
+            consumerProperties.put("max.poll.records", "1");
+            consumerProperties.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+            consumerProperties.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
 
-        /*
-         * Creating a thread to listen to the kafka topic
-         */
-        Thread kafkaConsumerThread = new Thread(() -> {
-            logger.info("Starting Kafka consumer thread.");
+            /*
+             * Creating a thread to listen to the kafka topic
+             */
+            Thread kafkaConsumerThread = new Thread(() -> {
+                logger.info("Starting Kafka consumer thread.");
 
-            SimpleKafkaConsumer simpleKafkaConsumer = new SimpleKafkaConsumer(
-                    theTechCheckTopicName,
-                    consumerProperties
-            );
+                SimpleKafkaConsumer simpleKafkaConsumer = new SimpleKafkaConsumer(
+                        topicName,
+                        consumerProperties
+                );
 
-            simpleKafkaConsumer.runSingleWorker();
-        });
+                simpleKafkaConsumer.runSingleWorker();
+            });
 
-        /*
-         * Starting the first thread.
-         */
-        kafkaConsumerThread.start();
+            /*
+             * Starting the first thread.
+             */
+            kafkaConsumerThread.start();
+        }
     }
 
     /**
@@ -114,7 +122,7 @@ public class SimpleKafkaProducerApplication implements CommandLineRunner {
         simple message to Kafka.
          */
         for (int index = 0; index < 10; index++) {
-            sendKafkaMessage("The index is now: " + index, producer, theTechCheckTopicName);
+            sendKafkaMessage("The index is now: " + index, producer, topicName);
         }
 
         /*
@@ -159,7 +167,7 @@ public class SimpleKafkaProducerApplication implements CommandLineRunner {
             You can use any JSON library for this, just make sure it serializes your objects properly.
             A popular alternative to the one I've used is Gson.
              */
-            sendKafkaMessage(jsonObject.toString(), producer, theTechCheckTopicName);
+            sendKafkaMessage(jsonObject.toString(), producer, topicName);
         }
     }
 
