@@ -9,10 +9,8 @@ import org.apache.log4j.Logger;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
+import java.time.Duration;
+import java.util.*;
 
 public class SimpleKafkaConsumer {
 
@@ -23,7 +21,9 @@ public class SimpleKafkaConsumer {
     public SimpleKafkaConsumer(String theTechCheckTopicName, Properties consumerProperties) {
 
         kafkaConsumer = new KafkaConsumer<>(consumerProperties);
-        kafkaConsumer.subscribe(Arrays.asList(theTechCheckTopicName));
+        List<String> topics = new ArrayList<>();
+        topics.add(theTechCheckTopicName);
+        kafkaConsumer.subscribe(topics);
     }
 
     /**
@@ -39,7 +39,7 @@ public class SimpleKafkaConsumer {
          */
         while(true) {
 
-            ConsumerRecords<String, String> records = kafkaConsumer.poll(100);
+            ConsumerRecords<String, String> records = kafkaConsumer.poll(Duration.ofMillis(100));
 
             for (ConsumerRecord<String, String> record : records) {
 
