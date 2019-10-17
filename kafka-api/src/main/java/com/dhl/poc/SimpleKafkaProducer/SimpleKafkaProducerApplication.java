@@ -16,7 +16,7 @@ import java.util.Properties;
 @SpringBootApplication
 public class SimpleKafkaProducerApplication implements CommandLineRunner {
 
-    @Value("${kafka.topic.thetechcheck}")
+    @Value("${kafka.topic}")
     private String theTechCheckTopicName;
 
     @Value("${kafka.bootstrap.servers}")
