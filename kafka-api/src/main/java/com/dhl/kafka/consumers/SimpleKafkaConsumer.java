@@ -1,4 +1,4 @@
-package com.dhl.poc.SimpleKafkaProducer.kafkaConsumers;
+package com.dhl.kafka.consumers;
 
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
@@ -18,11 +18,11 @@ public class SimpleKafkaConsumer {
 
     private KafkaConsumer<String, String> kafkaConsumer;
 
-    public SimpleKafkaConsumer(String theTechCheckTopicName, Properties consumerProperties) {
+    public SimpleKafkaConsumer(String topic, Properties consumerProperties) {
 
         kafkaConsumer = new KafkaConsumer<>(consumerProperties);
         List<String> topics = new ArrayList<>();
-        topics.add(theTechCheckTopicName);
+        topics.add(topic);
         kafkaConsumer.subscribe(topics);
     }
 
@@ -39,6 +39,7 @@ public class SimpleKafkaConsumer {
          */
         while(true) {
 
+            //kafkaConsumer.poll(Duration.ZERO);
             ConsumerRecords<String, String> records = kafkaConsumer.poll(Duration.ofMillis(100));
 
             for (ConsumerRecord<String, String> record : records) {
@@ -85,7 +86,7 @@ public class SimpleKafkaConsumer {
                 instead, we're going to manually commit the offsets.
                 The code for this is below. It's pretty much self explanatory.
                  */
-                {
+                /*{
                     Map<TopicPartition, OffsetAndMetadata> commitMessage = new HashMap<>();
 
                     commitMessage.put(new TopicPartition(record.topic(), record.partition()),
@@ -94,7 +95,9 @@ public class SimpleKafkaConsumer {
                     kafkaConsumer.commitSync(commitMessage);
 
                     logger.info("Offset committed to Kafka.");
-                }
+                    logger.info("Record offset: " + record.offset());
+                }*/
+                logger.info("Record offset: " + record.offset());
             }
         }
     }

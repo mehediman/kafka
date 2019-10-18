@@ -19,6 +19,9 @@ services:
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_CREATE_TOPICS: "bwh-ecg:1:1"
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: >- 
+        LISTENER_DOCKER_INTERNAL:SSL,
+        LISTENER_DOCKER_EXTERNAL:SSL
       KAFKA_LOG4J_LOGGERS: >- 
         kafka.controller=INFO,
         kafka.producer.async.DefaultEventHandler=INFO,
