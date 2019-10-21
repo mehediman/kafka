@@ -1,0 +1,34 @@
+version: '3.2'
+
+services:
+  # https://github.com/wurstmeister/zookeeper-docker
+  zookeeper:
+    container_name: zookeeper
+    image: wurstmeister/zookeeper:latest
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+    ports:
+    - "2181:2181"
+
+  # https://hub.docker.com/r/confluentinc/cp-kafka/
+  kafka:
+    container_name: kafka
+    image: wurstmeister/kafka
+    environment:
+      KAFKA_ADVERTISED_HOST_NAME: localhost
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_CREATE_TOPICS: "bwh-ecg:1:1"
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: >- 
+        LISTENER_DOCKER_INTERNAL:SSL,
+        LISTENER_DOCKER_EXTERNAL:SSL
+      KAFKA_LOG4J_LOGGERS: >- 
+        kafka.controller=INFO,
+        kafka.producer.async.DefaultEventHandler=INFO,
+        state.change.logger=INFO
+    ports:
+    - 9092:9092
+    depends_on:
+    - zookeeper
+    volumes:
+    - /var/run/docker.sock:/var/run/docker.sock
