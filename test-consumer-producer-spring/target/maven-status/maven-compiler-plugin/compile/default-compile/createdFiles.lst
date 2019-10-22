@@ -1,0 +1,7 @@
+com/samsung/dhl/consumers/TextMessageConsumer.class
+com/samsung/dhl/consumers/JSONConsumer.class
+com/samsung/dhl/consumers/BasicConsumer.class
+com/samsung/dhl/producers/JSONProducer.class
+com/samsung/dhl/TestConsumerSpring.class
+com/samsung/dhl/producers/BasicProducer.class
+com/samsung/dhl/producers/TextMessageProducer.class

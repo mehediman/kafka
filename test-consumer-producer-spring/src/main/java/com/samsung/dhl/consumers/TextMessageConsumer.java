@@ -3,14 +3,13 @@ package com.samsung.dhl.consumers;
 import org.apache.kafka.clients.consumer.*;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.log4j.Logger;
-import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.time.Duration;
 import java.util.*;
 
-public class JSONConsumer extends BasicConsumer{
+public class TextMessageConsumer extends BasicConsumer {
+
     @Value("${consumer.id}")
     private String CONSUMER_ID;
 
@@ -36,7 +35,7 @@ public class JSONConsumer extends BasicConsumer{
 
     private KafkaConsumer<String, String> kafkaConsumer;
 
-    public JSONConsumer(List<String> consumerTopic) {
+    public TextMessageConsumer(List<String> consumerTopic) {
         setKafkaConsumerConfiguration();
         this.kafkaConsumer = new KafkaConsumer<>(properties);
         kafkaConsumer.subscribe(consumerTopic);
@@ -65,15 +64,7 @@ public class JSONConsumer extends BasicConsumer{
             for (ConsumerRecord<String, String> record : records) {
 
                 String message = record.value();
-                logger.info("Received message: " + message);
-
-                try {
-                    JSONObject receivedJsonObject = new JSONObject(message);
-                    logger.info("Index of de-serialized JSON object: " + receivedJsonObject.getInt("index"));
-                } catch (JSONException e) {
-                    logger.error(e.getMessage());
-                }
-
+                logger.info("Received text message: " + message);
                 Map<TopicPartition, OffsetAndMetadata> commitMessage = new HashMap<>();
                 commitMessage.put(new TopicPartition(record.topic(), record.partition()), new OffsetAndMetadata(record.offset() + 1));
 
